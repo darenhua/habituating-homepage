@@ -1,0 +1,9 @@
+{
+    "name": "My Custom New Tab",
+    "version": "1.0",
+    "manifest_version": 3,
+    "description": "Replaces Chrome's New Tab page with my React app",
+    "chrome_url_overrides": {
+        "newtab": "dist/index.html"
+    }
+}
