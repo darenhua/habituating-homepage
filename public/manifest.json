@@ -4,6 +4,9 @@
     "manifest_version": 3,
     "description": "Replaces Chrome's New Tab page with my React app",
     "chrome_url_overrides": {
-        "newtab": "dist/index.html"
+        "newtab": "index.html"
+    },
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
     }
 }
