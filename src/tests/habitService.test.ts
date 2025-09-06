@@ -178,7 +178,10 @@ describe("habitService", () => {
             await supabase
                 .from("habit_tracking")
                 .delete()
-                .in("date", yearTestData.map(d => d.date));
+                .in(
+                    "date",
+                    yearTestData.map((d) => d.date),
+                );
         });
 
         it("should return habits from start of current year", async () => {
@@ -215,6 +218,17 @@ describe("habitService", () => {
                 .insert([...testData, ...yearTestData]);
         });
 
+        it("should validate year boundary calculation", async () => {
+            const habits = await getYearHabits();
+            const startOfCurrentYear = startOfYear(testDate);
+
+            habits.forEach((habit) => {
+                const habitDate = new Date(habit.date);
+                expect(habitDate.getTime()).toBeGreaterThanOrEqual(
+                    startOfCurrentYear.getTime(),
+                );
+            });
+        });
 
         it("should handle database errors gracefully", async () => {
             await expect(getYearHabits()).resolves.toBeDefined();
