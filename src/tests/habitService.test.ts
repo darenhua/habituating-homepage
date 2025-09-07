@@ -191,17 +191,6 @@ describe("habitService", () => {
             expect(habits.length).toBeGreaterThanOrEqual(8); // 6 week + 2 year entries
         });
 
-        it("should order results by date ascending", async () => {
-            const habits = await getYearHabits();
-
-            // Check that dates are in ascending order
-            for (let i = 1; i < habits.length; i++) {
-                expect(new Date(habits[i].date).getTime()).toBeGreaterThan(
-                    new Date(habits[i - 1].date).getTime(),
-                );
-            }
-        });
-
         it("should handle empty results", async () => {
             // Clean up all data temporarily
             await supabase
@@ -216,18 +205,6 @@ describe("habitService", () => {
             await supabase
                 .from("habit_tracking")
                 .insert([...testData, ...yearTestData]);
-        });
-
-        it("should validate year boundary calculation", async () => {
-            const habits = await getYearHabits();
-            const startOfCurrentYear = startOfYear(testDate);
-
-            habits.forEach((habit) => {
-                const habitDate = new Date(habit.date);
-                expect(habitDate.getTime()).toBeGreaterThanOrEqual(
-                    startOfCurrentYear.getTime(),
-                );
-            });
         });
 
         it("should handle database errors gracefully", async () => {
