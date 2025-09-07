@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { saveHabitEntry } from '../services/habitService'
-import { useHabitData } from './useHabitData'
+import type { HabitEntry } from '../services/habitService'
+import { triggerConfetti } from '../utils/animations'
 
 interface ModalFormData {
   codingLevel: string
@@ -10,21 +11,22 @@ interface ModalFormData {
   date: string
 }
 
-export function useDailyLoginModal(viewMode: 'weekly' | 'yearly') {
+export function useDailyLoginModal(
+  viewMode: 'weekly' | 'yearly',
+  habits: HabitEntry[] | undefined,
+  refetch: () => void
+) {
   const [isOpen, setIsOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const queryClient = useQueryClient()
-  
-  const { data: habits, isLoading } = useHabitData({ viewMode })
   
   const today = format(new Date(), 'yyyy-MM-dd')
   
   useEffect(() => {
-    if (!isLoading && habits) {
+    if (habits !== undefined) {
       const hasTodayEntry = habits.length > 0 && habits[habits.length - 1]?.date === today
       setIsOpen(!hasTodayEntry)
     }
-  }, [habits, isLoading, today])
+  }, [habits, today])
   
   const submitMutation = useMutation({
     mutationFn: async (data: ModalFormData) => {
@@ -38,7 +40,11 @@ export function useDailyLoginModal(viewMode: 'weekly' | 'yearly') {
     onSuccess: () => {
       setError(null)
       setIsOpen(false)
-      queryClient.invalidateQueries({ queryKey: ['habits'] })
+      refetch()
+      // Trigger confetti animation after successful submission
+      setTimeout(() => {
+        triggerConfetti()
+      }, 100)
     },
     onError: (error: Error) => {
       setError(error.message || 'Failed to save habit entry')
